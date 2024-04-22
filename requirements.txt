@@ -9,5 +9,4 @@ pyttsx3
 dataclasses
 flask_cors
 langchain_google_genai
-faiss-cpu
-faiss-gpu
+

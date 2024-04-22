@@ -102,9 +102,9 @@ def user_input(prompt):
     student_data = get_student_data(student_name['text'])
     if not student_data:
         return "No student found with the given name."
-    elif len(student_data) > 1:
-        print(student_data)
-        return handle_multiple_students(student_data, prompt)
+    # elif len(student_data) > 1:
+    #     print(student_data)
+    #     return handle_multiple_students(student_data, prompt)
     else:
         student_dict = student_data[0]
         context = str(student_dict)

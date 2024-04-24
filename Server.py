@@ -109,15 +109,6 @@ def extract_time(user_input):
                 return "now"
     return None
 
-def get_student_tt_info(student_info):
-    if 'Class' not in student_info:
-        return None
-    api_url = f"https://script.google.com/macros/s/AKfycbwP3XOlI33GcQzZ1m7DWzt-CuwRy3YB8BBwGU_0lFf7KD56kUY/exec?spreadsheet=a&action=get&id={sheet_id}&sheet={student_info['Class']}&sheetuser=all&sheetuserIndex=0"
-    response = requests.get(api_url)
-    data = response.json()
-    return data
-
-
 def get_student_location_info(student_info, user_input, response):
     ist = pytz.timezone('Asia/Kolkata')
     now = datetime.now(ist)
@@ -234,8 +225,6 @@ def get_conversational_chain():
 
     Given the following context and query, provide the requested information if it's available in the data. If the requested information is not available, respond with "I'm sorry, but the requested information is not available in the student's data."
 
-    and give whole sentence as response like if asked for enrollment number give response as "Enrollment of {student name} is {enrollment number}" it can be for anything like batch , class , email id , phone number etc
-
     Context:
     {context}
 
@@ -267,8 +256,8 @@ def user_input(prompt):
     student_data = get_student_data(student_name['text'])
     if not student_data:
         return "No student found with the given name."
-    # elif len(student_data) > 1:
-    #     return handle_multiple_students(student_data, prompt)
+    elif len(student_data) > 1:
+        return handle_multiple_students(student_data, prompt)
     else:
         student_dict = student_data[0]
         context = str(student_dict)
@@ -291,28 +280,28 @@ def user_input(prompt):
         response = chain({"input_documents": documents, "question": prompt}, return_only_outputs=True)
         return response['output_text']
 
-# def handle_multiple_students(student_data, prompt):
-#     options = []
-#     for i, student in enumerate(student_data, start=1):
-#         name = student.name
-#         options.append(f"Option {i}: {name}")
+def handle_multiple_students(student_data, prompt):
+    options = []
+    for i, student in enumerate(student_data, start=1):
+        name = student.name
+        options.append(f"Option {i}: {name}")
 
-#     response = "Please select the student you are looking for:\n"
-#     for option in options:
-#         response += option + "\n"
-#     print(response)
+    response = "Please select the student you are looking for:\n"
+    for option in options:
+        response += option + "\n"
+    print(response)
 
-#     response += "Enter the option number: "
-#     print(options)
-#     selected_index = int(input()) - 1
-#     selected_student = student_data[selected_index]
-#     print(asdict(selected_student))
-#     context = asdict(selected_student)
-#     text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-#     chunks = text_splitter.split_text(str(context))
-#     chain = get_conversational_chain()
-#     response = chain({"context": context, "question": prompt}, return_only_outputs=True)
-#     return response['output_text']
+    response += "Enter the option number: "
+    print(options)
+    selected_index = int(input()) - 1
+    selected_student = student_data[selected_index]
+    print(asdict(selected_student))
+    context = asdict(selected_student)
+    text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+    chunks = text_splitter.split_text(str(context))
+    chain = get_conversational_chain()
+    response = chain({"context": context, "question": prompt}, return_only_outputs=True)
+    return response['output_text']
 
 @app.route('/', methods=["GET"])
 def hii():

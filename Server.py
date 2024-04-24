@@ -93,6 +93,12 @@ def get_conversational_chain():
 
 
 def user_input(prompt):
+    # Check for greeting intents
+    greeting_patterns = r'hi|hello|hey'
+    if re.search(greeting_patterns, prompt, re.IGNORECASE):
+        return "Hello! What can I do for you?"
+
+    # If not a greeting, proceed with the existing logic
     student_name = extract_student_name(prompt)
     print(student_name['text'])
     if student_name is None:

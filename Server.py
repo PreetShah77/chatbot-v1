@@ -94,7 +94,7 @@ def get_conversational_chain():
 
 def user_input(prompt):
     # Check for greeting intents
-    greeting_patterns = r'hi|hello|hey'
+    greeting_patterns =  r'^(hi|hello|hey)\b'
     if re.search(greeting_patterns, prompt, re.IGNORECASE):
         return "Hello! What can I do for you?"
 

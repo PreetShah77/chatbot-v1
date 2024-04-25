@@ -1,1 +1,135 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(117deg, #dce7cb 15%, #a9ccc3 100%);
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-container {
+  max-width: 40%;
+  max-height: 600px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  background-color: #0084ff;
+  color: #fff;
+  padding: 10px;
+  text-align: center;
+  font-size: 24px;
+}
+
+.chat-messages {
+  padding: 10px;
+  height: 400px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.chat-input {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  outline: none;
+}
+
+.chat-input .send-button {
+  margin-left: 10px;
+  background-color: #0084ff;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.user-message, .bot-message {
+  max-width: 90%;
+  word-wrap: break-word;
+  margin-bottom: 10px;
+}
+
+.user-message {
+  background-color: #0084ff;
+  color: #fff;
+  border-radius: 10px;
+  margin-right: 10px;
+  text-align: left;
+  text-indent: 1%;
+}
+
+.bot-message {
+  background-color: #f5f5f5;
+  color: #333;
+  padding: 10px;
+  border-radius: 10px;
+  margin-right: auto;
+  text-align: left;
+}
+
+.action-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 10%;
+  border: 1%;
+  border-color: #0084ff;
+  background-color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.action-button img {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  margin-left: 10%;
+}
+
+#overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  z-index: 999;
+}
+#loadingOverlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+  visibility: hidden;
+}
 

@@ -12,4 +12,4 @@ flask_cors
 langchain_google_genai
 pytz
 python-dateutil==2.8.2
-PIL
+Pillow

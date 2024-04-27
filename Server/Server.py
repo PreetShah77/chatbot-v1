@@ -11,6 +11,7 @@ from langchain.prompts import PromptTemplate
 from dotenv import load_dotenv
 from langchain.chains import LLMChain
 import re
+from PIL import Image
 import pyttsx3
 from dataclasses import dataclass, asdict
 from langchain.docstore.document import Document
@@ -33,6 +34,29 @@ CORS(app)  # Initialize CORS with your Flask app
 class Student:
     name: str
     data: dict
+
+
+def get_data(input_prompt, image_data):
+    model = genai.GenerativeModel('gemini-pro-vision')
+    response = model.generate_content([input_prompt, image_data[0]])
+    return response.text
+
+# Function to process the uploaded image
+def image_process(file):
+    if file:
+        bytes_data = file.read()
+        image_parts = [
+            {
+                "mime_type": file.content_type,
+                "data": bytes_data
+            }
+        ]
+        return image_parts
+    else:
+        raise FileNotFoundError("Check the file is uploaded properly")
+
+# Server endpoint to handle the image request
+
 
 # Add the necessary functions from the StudentInfoChatbot class
 def convert_to_24_hours(time_str):
@@ -141,6 +165,7 @@ def get_student_location_info(student_info, user_input, response):
     # print("target_time=", target_time)
     student_location, subject, teacher, time_duration = get_current_schedule(get_student_tt_info(student_info),
                                                                              target_time)
+    print(student_location, subject, teacher, time_duration)
     if time_duration is None:
         response['message'] = f"The college schedule for {student_info['Name of Student']} does not provided by authority."
     else:
@@ -173,7 +198,7 @@ def get_conversational_chain1():
     prompt_template = """
     Extract the named entity from the given prompt:
     Prompt: {prompt}
-    Named Entity: {named_entity}
+    {named_entity}
     """
     model = ChatGoogleGenerativeAI(model="gemini-pro", client=genai, temperature=0.3)
     prompt = PromptTemplate(template=prompt_template, input_variables=["prompt", "named_entity"])
@@ -257,8 +282,8 @@ def user_input(prompt):
     student_data = get_student_data(student_name['text'])
     if not student_data:
         return "No student found with the given name."
-    elif len(student_data) > 1:
-        return handle_multiple_students(student_data, prompt)
+    # elif len(student_data) > 1:
+    #     return handle_multiple_students(student_data, prompt)
     else:
         student_dict = student_data[0]
         context = str(student_dict)
@@ -279,7 +304,25 @@ def user_input(prompt):
 
         # If not a location query, proceed with the regular question answering
         response = chain({"input_documents": documents, "question": prompt}, return_only_outputs=True)
-        return response['output_text']
+
+        keyword_map = {
+            'enrollment': "Enrollment number",
+            'enroll': "Enrollment number",
+            'phone': "Phone number",
+            'batch': "Batch",
+            'class': "Class",
+            'email': "Email id",
+            'email id': "Email id",
+            'phone number': "Phone number",
+            'enrollment number': "Enrollment number"
+            }
+
+        if any(key in prompt.lower() for key in keyword_map):
+            for key in keyword_map:
+                if key in prompt.lower():
+                    return f"{keyword_map[key]} of {student_name['text']} is {response['output_text']}"
+
+        # return response['output_text']
 
 def handle_multiple_students(student_data, prompt):
     options = []
@@ -307,6 +350,18 @@ def handle_multiple_students(student_data, prompt):
 @app.route('/', methods=["GET"])
 def hii():
     return "hii", 200
+
+@app.route('/image_description', methods=['POST'])
+def image_description():
+    input_prompt = """You are an expert in analysing the image. User will upload any kind of image, and you need to answer questions about the image from the image alone. You can also find faces in the image and tell their names if you have the information."""
+    input_text = "Write information about the uploaded image and write in detail about its contents."
+
+    file = request.files.get('image')
+    image_data = image_process(file)
+
+    response = get_data(input_prompt, image_data)
+
+    return jsonify({'description': response})
 
 @app.route('/get_student_info', methods=['POST'])
 def get_student_info():
